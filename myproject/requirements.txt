@@ -1,6 +1,6 @@
 Django==5.0.6
 html5lib
-matplotlib @ file:///croot/matplotlib-suite_1713336378214/work
+matplotlib
 numpy
 pandas 
 pathlib
