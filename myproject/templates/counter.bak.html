@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>matplot</title>
+  </head>
+  <body>
+    <img src="uri:image/png;base64,{{ uri }}" alt="" height="250" ,width="250">
+    <!-- <img src="data.uri:image/png;base64,{{ data.uri }}" alt="" height="250" ,width="250"> -->
+  </body>
+</html>
+
+<!-- {% if data %} -->
+<!-- <ul> -->
+<!--   {% for k, v in data.items %} -->
+<!--   {% if k != "uri" %} -->
+<!--   <li>{{ k}} : {{v}}</li> -->
+<!--   {%endif%} -->
+<!--   {% endfor %} -->
+<!-- </ul> -->
+<!-- {% else %} -->
+<!-- <p>data not available.</p> -->
+<!-- {% endif %} -->
+
+
+<!-- {% for menu_item in argnames %} -->
+<!-- <li><a>{{ menu_item }}: {{RH}}</a></li> -->
+<!-- {% endfor %} -->
+
+<!-- <\!-- <\\!-- <script language = "javascript" type = "text/javascript"> -\\-> -\-> -->
+  <!--   <\!--   <script language="javascript" type="text/javascript"> -\-> -->
+    <!--     <\!--   var argnames =  {{argnames}}; -\-> -->
+      <!--     <\!--   for(var i = 0; i < {{argnames}}.length; i++){ -\-> -->
+        <!--     <\!--     // document.write(argnames[i]); -\-> -->
+          <!--     <\!--     document.write(`label = ${argnames[i]}`); -\-> -->
+            <!--     <\!--   } -\-> -->
+              <!--     <\!-- </script> -\-> -->
+
+                <!--   <script> -->
+                  <!--     var argnames = [ -->
+                  <!--       {%for arg in argnames%} -->
+                  <!--       arg, -->
+                  <!--       {% endfor %} -->
+                  <!--     ] -->
+                  <!--     for(var i = 0; i < argnames.length; i++){ -->
+                  <!--       document.write("<li> <a>My list"+i+"</a></li>"); -->
+                  <!--     } -->
+                  <!--   </script> -->

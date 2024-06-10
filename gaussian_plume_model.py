@@ -14,7 +14,7 @@ import sys
 from scipy.special import erfcinv as erfcinv
 import tqdm as tqdm
 import time
-
+import math
 from gauss_func import gauss_func
 
 import matplotlib.pyplot as plt
@@ -29,19 +29,44 @@ import requests
 #rc('font',**{'family':'serif','serif':['Palatino']})
 # rc('text', usetex=True)
 
+def convert_point(x, y, deg):
+    theta1 = math.radians(deg)
+    r = math.sqrt(x*x + y*y)
+    if r == 0:
+        return x, y
+    cos0 = x / r
+    sin0 = y / r
+    sin_t = math.sin(theta1)
+    cos_t = math.cos(theta1)
+    sin1 = sin0 * cos_t + cos0 * sin_t
+    cos1 = cos0 * cos_t - sin0 * sin_t
+    return r * cos1, r *sin1
 
+def convert_points(X, Y, deg):
+    newX = np.zeros_like(X)
+    newY = np.zeros_like(Y)
+
+    for row in range(newX.shape[0]):
+        for col in range(newX.shape[1]):
+            newX[row, col], newY[row, col] = convert_point(X[row, col], Y[row, col], deg)
+    return newX, newY
+
+
+# def get_xy_from_latlon(lat, lon, onemap_api_key):
+    # set_trace()
+    # xy_shift = []
+    # for i in range(stacks):
+    #     xy_shift.append([xy_coors[i][0] - xy_coors[0][0], xy_coors[i][1] - xy_coors[0][1]])
 
 def smooth(y, box_pts):
     box = np.ones(box_pts)/box_pts
     y_smooth = np.convolve(y, box, mode='same')
     return y_smooth
 
-def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, onemap_api_key = None):
+def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, cen_lat, cen_lon, rotate_counter_clock_wise = 0, onemap_api_key = None):
     ###########################################################################
     # Do not change these variables                                           #
     ###########################################################################
-
-
     # SECTION 0: Definitions (normally don't modify this section)
     # view
     PLAN_VIEW=1;
@@ -89,15 +114,6 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     Dz=10.;
 
     # SECTION 2: Act on the configuration information
-    # xy_coors = []
-    # for i in range(stacks):
-    #     xy_coors.append(coor_convert(stack_x[i], stack_y[i], onemap_api_key, '4326to3414'))
-    # set_trace()
-    # xy_shift = []
-    # for i in range(stacks):
-    #     xy_shift.append([xy_coors[i][0] - xy_coors[0][0], xy_coors[i][1] - xy_coors[0][1]])
-
-
     # Decide which stability profile to use
     if stability_used == CONSTANT_STABILITY:
 
@@ -187,7 +203,12 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     if output == PLAN_VIEW:
        plt.figure()
        # plt.ion()
-       plt.pcolor(x,y,np.mean(C1,axis=2)*1e6, cmap=cmap) # 'jet')
+       new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
+       x,y = coor_convert(cen_lat, cen_lon, onemap_api_key, '4326to3414')
+       new_x, new_y = new_x + x, new_y + y
+       # plt.pcolor(x,y,np.mean(C1,axis=2)*1e6, cmap=cmap)
+       # 'jet')
+       plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
        plt.clim((0, 1e2));
        plt.title(stability_str + '\n' + wind_dir_str);
        plt.xlabel('x (metres)');
@@ -195,6 +216,8 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        cb1=plt.colorbar();
        cb1.set_label('$\mu$ g m$^{-3}$');
        # from pdb import set_trace; set_trace()
+
+       # print(convert_point(1, 0, 45))
        return process_plot(plt)
        # plt.show()
 
@@ -259,9 +282,9 @@ def coor_convert(val1, val2, api_key, option):
         argnames = ['X', 'Y']
         outputnames = ['latitude', 'longitude']
     rurl = f'https://www.onemap.gov.sg/api/common/convert/{option}?{argnames[0]}={val1}&{argnames[1]}={val2}'
+    print(rurl)
     headers = {"Authorization": api_key}
     response = requests.request("GET", rurl, headers=headers)
-
     assert response.status_code == 200
     result = response.json()
     return result[outputnames[0]], result[outputnames[1]]
@@ -338,5 +361,4 @@ if __name__=="__main__":
     Q=[40., 40., 40.]; # mass emitted per unit time
     H=[50., 50., 50.]; # stack height, m
     days=50;          # run the model for 365 days
-
     run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days)

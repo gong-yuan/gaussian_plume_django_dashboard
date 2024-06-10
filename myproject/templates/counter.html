@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+{% load myapp_extras %}
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Gaussian Plume Model</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'myproject/style.css' %}">
+  </head>
+
+<script language="javascript" type="text/javascript">
+  function toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+  }
+  var view_types = ["PLAN_VIEW", "HEIGHT_SLICE", "SURFACE_TIME", "NO_PLOT"];
+
+</script>
+
+  <div style="display:block; width:100%;">
+    <div style="width:30%; float: left; display: inline-block;">
+      {% if data %}
+      <ul>
+        {% for k, v in data.items %}
+        {% if k != "uri" and k != "onemap_api_key" %}
+            {%if option_values|is_in:k %}
+                <li>{{label|dict_key:k}} : {{option_values|to_title_case:k}}</li>
+            {%else%}
+                <li>{{label|dict_key:k}} : {{data|dict_key:k}}</li>
+            {%endif%}
+        {%endif%}
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>data not available.</p>
+      {% endif %} <br>
+
+<input type="button" value="Go Back" onclick="history.back()"> <br><br><br>
+
+
+  <script>
+        var currentdate = new Date();
+    var datetime = "Output_" + currentdate.getFullYear() + "-"
+        + (currentdate.getMonth()+1)  + "-"
+        + currentdate.getDate() + "_"
+        + currentdate.getHours() + "-"
+        + currentdate.getMinutes() + "-"
+        + currentdate.getSeconds();
+    document.write(`<a href="data:image/png;base64,{{ data.uri }}" class = "button" download="${datetime}">Save Image</a> <br><br><br>`)
+    </script>
+
+
+<label> Support Contact: </label>
+<a>  Gong_Yuan@nea.gov.sg </a>
+    
+    </div>
+    <div style="width:70%; float: left; display: inline-block;">
+      <body>
+        <img src="data:image/png;base64,{{ data.uri }}" alt="" height="500",width="500">
+      </body> <br><br>
+    </div>
+  </div>
+
+  </html>
+
+
+
+
+
+

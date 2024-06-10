@@ -1,0 +1,118 @@
+<head>
+  <title>Gaussian Plume Model</title>
+</head>
+<script language="javascript" type="text/javascript">
+  function toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+  }
+
+  function add_option(options, option_id, option_label){
+    document.write(`<label for = "${option_id}"> ${option_label}: </label>`);
+    document.write(`<select name = "${option_id}" id = "${option_id}" required>`);
+    document.write(`<option value="" disabled selected>Please choose </option>`);
+    for(var i = 0; i < options.length; i++)
+    {
+      var val = options[i];
+      document.write(`<option value = ${i+1}> ${toTitleCase(val.replace(/_/g, ' '))} </option>`);
+    }
+    document.write("</select> <br>");
+  }
+  </script>
+
+<!-- <div style="display:block; width:100%;"> -->
+<!--   <div style="width:50%; float: left; display: inline-block;"> -->
+<!--   </div> -->
+<!--   <div style="width:70%; float: left; display: inline-block;"> -->
+<!--   </div> -->
+<!-- </div> -->
+<form method = "" action = "counter">
+  <script language="javascript" type="text/javascript">
+    var fields_p1 = {"RH": "RH", "dry_size": "Dry Size", "x_slice": "Slice id in x-driection (1-50)", "y_slice": "Slice id in y-direction (1-50)", "days": "No. days to run the model"
+                 };
+    for(var key in fields_p1)
+    {
+      var val = fields_p1[key];
+      document.write(`<label for = "${key}"> ${val}:  </label>`);
+      document.write(`<input type = "text" name = "${key}" id = "${key}" required> <br>`);
+    }
+
+
+    var option_id_labels = {
+      "stacks": "Number of Stacks"
+    }
+    var option_list = {
+      "stacks": ["ONE_STACK", "TWO_STACKS", "THREE_STACKS"]
+    }
+
+    for(var key in option_id_labels)
+    {
+      var option_label = option_id_labels[key];
+      var options = option_list[key];
+      add_option(options, key, option_label)
+    }
+
+</script>
+
+  <div id = "stackparams" hidden language="javascript" type="text/javascript">
+    fields_p2 = {
+      "stack_x0": "x-coordinate of stack 1",
+      "stack_x1": "x-coordinate of stack 2",
+      "stack_x2": "x-coordinate of stack 3",
+
+      "stack_y0": "y-coordinate of stack 1",
+      "stack_y1": "y-coordinate of stack 2",
+      "stack_y2": "y-coordinate of stack 3",
+
+      "Q0": "Mass emitted per unit time of stack 1",
+      "Q1": "Mass emitted per unit time of stack 2",
+      "Q2": "Mass emitted per unit time of stack 3",
+
+      "H0": "Height of stack 1 (meters)",
+      "H1": "Height of stack 2 (meters)",
+      "H2": "Height of stack 3 (meters)"
+    }
+
+    for(var key in fields_p2)
+    {
+      var val = fields_p2[key];
+      document.write(`<label for = "${key}"> ${val}:  </label>`);
+      document.write(`<input type = "text" name = "${key}" id = "${key}" required> <br>`);
+    }
+   </div>
+
+  <script language="javascript" type="text/javascript">
+    var option_id_labels = {
+      "aerosol_type": "Aerosol Type",
+      "humidify": "Humidify",
+      "stab1": "Stability of the Atmosphere",
+      "stability_used": "Stability type",
+      "wind": "Wind Field",
+      "output": "Output View Type"
+    }
+    var option_list = {
+      "aerosol_type": ["SODIUM_CHLORIDE", "SULPHURIC_ACID", "ORGANIC_ACID", "AMMONIUM_NITRATE"],
+      "humidify": ["DRY_AEROSOL", "HUMIDIFY"],
+      "stab1": ["Very unstable", "Moderately unstable", "Slightly unstable", "Neutral", "Moderately stable", "Very stable"],
+      "stability_used": ["CONSTANT_STABILITY", "ANNUAL_CYCLE"],
+      "wind": ["CONSTANT_WIND", "FLUCTUATING_WIND", "PREVAILING_WIND"],
+      "output": ["PLAN_VIEW", "HEIGHT_SLICE", "SURFACE_TIME", "NO_PLOT"]
+    }
+
+    for(var key in option_id_labels)
+    {
+      var option_label = option_id_labels[key];
+      var options = option_list[key];
+      add_option(options, key, option_label)
+    }
+    </script>
+
+  <input type="submit" value = "Run Simulation">
+</form>
+
+  <label> Support Contact: </label>
+   <a>  Gong_Yuan@nea.gov.sg </a>
