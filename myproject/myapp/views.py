@@ -33,7 +33,8 @@ def counter(request):
               "dry_size": "Dry Diameter (m)",
               "x_slice": "Slice id in x-driection (1-50)",
               "y_slice": "Slice id in y-direction (1-50)",
-              "days": "Model Run-time in days", 'onemap_api_key': "Onemap API Key",
+              "days": "Model Run-time in days",
+              # 'onemap_api_key': "Onemap API Key",
               "stack_x0": "x-coordinate of stack 1",
               "stack_x1": "x-coordinate of stack 2",
               "stack_x2": "x-coordinate of stack 3",
@@ -55,7 +56,7 @@ def counter(request):
         "output": "Output View Type",
         "wind": "Wind Field",
         "wind_dir": "Wind Direction (→: 0, ↑: 90, ↓: 270, ←: 180)",
-              'cen_lat': "Center Latitude", 'cen_lon': "Center Longitude",
+        # 'cen_lat': "Center Latitude", 'cen_lon': "Center Longitude",
         "stacks": "Number of Stacks"
     }
 
@@ -112,13 +113,11 @@ def counter(request):
     Q=[context['Q' + str(x)] for x in range(stacks)]; # mass emitted per unit time
     H=[context['H' + str(x)] for x in range(stacks)]; # stack height, m
     days=context['days'];          # run the model for 365 days
-    onemap_api_key = context['onemap_api_key']
+    # onemap_api_key = context['onemap_api_key']
     wind_dir = float(context['wind_dir'])
     rotation = wind_dir - 270
 
-    cen_lat = float(context['cen_lat'])
-    cen_lon = float(context['cen_lon'])
-    uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, cen_lat, cen_lon, rotation, onemap_api_key)
+    uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, rotation)
     context['uri'] = uri
     # return render(request,'counter.html',{'data':uri})
     return render(request, 'counter.html', {'data': context, 'label': labels, 'option_values': option_values})

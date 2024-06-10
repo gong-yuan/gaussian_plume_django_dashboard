@@ -45,8 +45,10 @@ function add_stackparams(stack_id){
     fields_p2["Q" + stack_id_1] = "Mass emitted per unit time of stack " +  stack_id;
     fields_p2["H" + stack_id_1] = "Height of stack " + stack_id + " (m)";
 
-    var stack_x_default = [0, 1000, -200];
-    var stack_y_default = [0, 250, -500];
+    <!-- var stack_x_default = [0, 1000, -200]; -->
+    <!-- var stack_y_default = [0, 250, -500]; -->
+    var stack_x_default = [1.2815804, 1.2799174, 1.2719954];
+    var stack_y_default = [103.7078741, 103.7089471, 103.7085381];
     var q_default = [40, 40, 40];
     var h_default = [50, 50, 50];
     var  fields_p2_default = {};
@@ -69,27 +71,27 @@ function add_stackparams(stack_id){
 
 <form method = "" action = "counter">
 
-  <script language="javascript" type="text/javascript">
-    var fields_p1 = {'onemap_api_key': "Onemap API Key", 'cen_lat': "Center Latitude", 'cen_lon': "Center Longitude" 
-                    };
-    var fields_p1_default = {
-        'onemap_api_key': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjOTc0NDgxYjQzMDFhZjZiZjRjZjgwZDhmNDZkMWVjYiIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzE3NzQ2ODY3LCJleHAiOjE3MTgwMDYwNjcsIm5iZiI6MTcxNzc0Njg2NywianRpIjoidnlGNWlZTWgxNnNaTHFubCIsInVzZXJfaWQiOjMwODMsImZvcmV2ZXIiOmZhbHNlfQ.l7_qalx37VjrOrBQiS6ujyNjLqbTtYpv4RFDVDXnWE8', 'cen_lat':1.3576956, 'cen_lon': 103.8055135  
-    }
-    document.write("<fieldset>");
-    document.write("<legend>Center Location</legend>")
-    for(var key in fields_p1)
-    {
-        var val = fields_p1[key];
-        var default_value = fields_p1_default[key];
-        document.write(`<label for = "${key}"> ${val}:  </label>`);
-        if(key == 'onemap_api_key'){
-            document.write(`<textarea type = "text" name = "${key}" id = "${key}" rows="5" cols="100" required>${default_value}</textarea> <br>`);
-        } else {
-            document.write(`<input type = "text" name = "${key}" id = "${key}" required value = "${default_value}"> <br>`);
-        }
-    }
-    document.write("</fieldset>");    
-    </script>
+  <!-- <script language="javascript" type="text/javascript"> -->
+  <!--   var fields_p1 = {'onemap_api_key': "Onemap API Key", 'cen_lat': "Center Latitude", 'cen_lon': "Center Longitude"  -->
+  <!--                   }; -->
+  <!--   var fields_p1_default = { -->
+  <!--       'onemap_api_key': '', 'cen_lat':1.3576956, 'cen_lon': 103.8055135   -->
+  <!--   } -->
+  <!--   document.write("<fieldset>"); -->
+  <!--   document.write("<legend>Center Location</legend>") -->
+  <!--   for(var key in fields_p1) -->
+  <!--   { -->
+  <!--       var val = fields_p1[key]; -->
+  <!--       var default_value = fields_p1_default[key]; -->
+  <!--       document.write(`<label for = "${key}"> ${val}:  </label>`); -->
+  <!--       if(key == 'onemap_api_key'){ -->
+  <!--           document.write(`<textarea type = "text" name = "${key}" id = "${key}" rows="5" cols="100" required>${default_value}</textarea> <br>`); -->
+  <!--       } else { -->
+  <!--           document.write(`<input type = "text" name = "${key}" id = "${key}" required value = "${default_value}"> <br>`); -->
+  <!--       } -->
+  <!--   } -->
+  <!--   document.write("</fieldset>");     -->
+  <!--   </script> -->
 
 
   <script language="javascript" type="text/javascript">

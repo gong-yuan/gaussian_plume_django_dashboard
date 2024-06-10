@@ -52,19 +52,70 @@ def convert_points(X, Y, deg):
     return newX, newY
 
 
-# def get_xy_from_latlon(lat, lon, onemap_api_key):
-    # set_trace()
-    # xy_shift = []
-    # for i in range(stacks):
-    #     xy_shift.append([xy_coors[i][0] - xy_coors[0][0], xy_coors[i][1] - xy_coors[0][1]])
+def coor_convert(val1, val2, api_key, option):
+    if option == '4326to3414':
+        argnames = ['latitude', 'longitude']
+        outputnames = ['X', 'Y']
+    elif option == '3414to4326':
+        argnames = ['X', 'Y']
+        outputnames = ['latitude', 'longitude']
+    rurl = f'https://www.onemap.gov.sg/api/common/convert/{option}?{argnames[0]}={val1}&{argnames[1]}={val2}'
+    print(rurl)
+    headers = {"Authorization": api_key}
+    response = requests.request("GET", rurl, headers=headers)
 
+    assert response.status_code == 200
+    result = response.json()
+    return result[outputnames[0]], result[outputnames[1]]
+
+
+def coors_convert(stack_x, stack_y, api_key, option):
+    stack_xnew = []
+    stack_ynew = []
+    for i in range(len(stack_x)):
+        x,y = coor_convert(stack_x[i], stack_y[i], api_key, option)
+        print("Convered: ", x,y)
+        stack_xnew.append(x)
+        stack_ynew.append(y)
+    return stack_xnew, stack_ynew
+
+def calc_center(stack_x, stack_y):
+    cx = 0
+    cy = 0
+    for i in range(len(stack_x)):
+        cx+=stack_x[i]
+        cy+=stack_y[i]
+    return cx / len(stack_x), cy / len(stack_y)
+
+def center_coors(stack_x, stack_y, cx, cy):
+    stack_xnew = []
+    stack_ynew = []
+    for i in range(len(stack_x)):
+        stack_xnew.append(stack_x[i] - cx)
+        stack_ynew.append(stack_y[i] - cy)
+    return stack_xnew, stack_ynew
+    
 def smooth(y, box_pts):
     box = np.ones(box_pts)/box_pts
     y_smooth = np.convolve(y, box, mode='same')
     return y_smooth
 
-def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, cen_lat, cen_lon, rotate_counter_clock_wise = 0, onemap_api_key = None):
+def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, rotate_counter_clock_wise = 0):
+    ##########################################################################
+    ##################Location Conversion#####################################
+    ##########################################################################
+    print("stack_x: ", stack_x, "stack_y: ", stack_y)
+    onemap_api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmY2Y3MjZjMmQ1NjgzNTI1NzZlNGIwYjc3NWZmN2ZjNSIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzE4MDExNTg5LCJleHAiOjE3MTgyNzA3ODksIm5iZiI6MTcxODAxMTU4OSwianRpIjoidlhrcHhMZWxXbjBzdHBUdyIsInVzZXJfaWQiOjM3NzAsImZvcmV2ZXIiOmZhbHNlfQ.JfCAVLciOb2qqxTxVIY3ylZs9HJCBnazpQoZRwTCRaY'
+    stack_x, stack_y = coors_convert(stack_x, stack_y, onemap_api_key, '4326to3414')
+    print("stack_xnew: ", stack_x, "stack_ynew: ", stack_y)
+    stack_xm = stack_x.copy()
+    stack_ym = stack_y.copy()
+    cx,cy = calc_center(stack_x, stack_y)
+    stack_x, stack_y = center_coors(stack_x, stack_y, cx, cy)
+    print("stack_xnew: ", stack_x, "stack_ynew: ", stack_y)
+    ##########################################################################
     ###########################################################################
+
     # Do not change these variables                                           #
     ###########################################################################
     # SECTION 0: Definitions (normally don't modify this section)
@@ -145,7 +196,6 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        sys.exit()
 
 
-
     # Set the wind based on input flags++++++++++++++++++++++++++++++++++++++++
     wind_speed=5.*np.ones((days*24,1)); # m/s
     if wind == CONSTANT_WIND:
@@ -204,11 +254,14 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        plt.figure()
        # plt.ion()
        new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
-       x,y = coor_convert(cen_lat, cen_lon, onemap_api_key, '4326to3414')
+       # set_trace()
+       x,y = calc_center(stack_xm, stack_ym)
+       # x,y = coor_convert(cen_lat, cen_lon, onemap_api_key, '4326to3414')
        new_x, new_y = new_x + x, new_y + y
        # plt.pcolor(x,y,np.mean(C1,axis=2)*1e6, cmap=cmap)
        # 'jet')
-       plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
+       # plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
+       plt.contour(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap='hot')
        plt.clim((0, 1e2));
        plt.title(stability_str + '\n' + wind_dir_str);
        plt.xlabel('x (metres)');
@@ -272,22 +325,6 @@ def process_plot(plt):
     string = base64.b64encode(buf.read())
     uri =  urllib.parse.quote(string)
     return uri # render(request,'home.html',{'data':uri})
-
-
-def coor_convert(val1, val2, api_key, option):
-    if option == '4326to3414':
-        argnames = ['latitude', 'longitude']
-        outputnames = ['X', 'Y']
-    elif option == '3414to4326':
-        argnames = ['X', 'Y']
-        outputnames = ['latitude', 'longitude']
-    rurl = f'https://www.onemap.gov.sg/api/common/convert/{option}?{argnames[0]}={val1}&{argnames[1]}={val2}'
-    print(rurl)
-    headers = {"Authorization": api_key}
-    response = requests.request("GET", rurl, headers=headers)
-    assert response.status_code == 200
-    result = response.json()
-    return result[outputnames[0]], result[outputnames[1]]
 
 
 if __name__=="__main__":
