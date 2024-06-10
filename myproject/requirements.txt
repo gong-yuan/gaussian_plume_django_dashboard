@@ -1,0 +1,17 @@
+Django==5.0.6
+html5lib
+matplotlib @ file:///croot/matplotlib-suite_1713336378214/work
+numpy
+pandas 
+pathlib
+python-dateutil
+pytz
+requests
+scipy 
+tqdm 
+tzdata
+unicodedata2 
+urllib3 
+webencodings
+wheel==0.43.0
+urllib
