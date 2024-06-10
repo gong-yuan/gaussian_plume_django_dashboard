@@ -1,4 +1,4 @@
-Django==5.0.6
+Django
 html5lib
 matplotlib
 numpy
@@ -13,5 +13,3 @@ tzdata
 unicodedata2 
 urllib3 
 webencodings
-wheel==0.43.0
-urllib
