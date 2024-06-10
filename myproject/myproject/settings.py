@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!&^x0kmqnoawcop68&smv99l!u!8k^!l-eu-z*ph58ihc@#+2=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '172.16.0.60']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'gaussian-plume-django-dashboard.onrender.com']
 
 
 # Application definition
