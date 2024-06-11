@@ -150,9 +150,9 @@ function add_stackparams(stack_id){
 
 
   <script language="javascript" type="text/javascript">
-    var fields_p1 = {"RH": "Relative Air Humidity", "dry_size": "Dry Diameter (m)", "x_slice": "Slice id in x-driection (1-50)", "y_slice": "Slice id in y-direction (1-50)", "days": "Model Run-time in days", "wind_dir": "Wind Direction (→: 0, ↑: 90, ↓: 270, ←: 180)"};
+    var fields_p1 = {"RH": "Relative Air Humidity", "dry_size": "Dry Diameter (m)", "days": "Model Run-time in days", "wind_dir": "Wind Direction (→: 0, ↑: 90, ↓: 270, ←: 180)"};
     var fields_p1_default = {
-        "RH": 0.90, "dry_size": 60/Math.pow(10, 9), "x_slice": 26, "y_slice": 1, 'days': 50, 'wind_dir': 270
+        "RH": 0.90, "dry_size": 60/Math.pow(10, 9), 'days': 50, 'wind_dir': 270
     }
     for(var key in fields_p1)
     {
@@ -207,18 +207,23 @@ function add_stackparams(stack_id){
 
 
 
+
+
+
+
+
+
+
   <script language="javascript" type="text/javascript">
     var option_id_labels = {
       "aerosol_type": "Aerosol Type",
       "humidify": "Humidify Aerosol?",
-      "wind": "Wind Field",
-      "output": "Output View Type"
+      "wind": "Wind Field"
     }
     var option_list = {
       "aerosol_type": ["SODIUM_CHLORIDE", "SULPHURIC_ACID", "ORGANIC_ACID", "AMMONIUM_NITRATE"],
       "humidify": ["DRY_AEROSOL", "HUMIDIFY"],
-      "wind": ["CONSTANT_WIND", "FLUCTUATING_WIND", "PREVAILING_WIND"],
-      "output": ["PLAN_VIEW", "HEIGHT_SLICE", "SURFACE_TIME", "NO_PLOT"]
+      "wind": ["CONSTANT_WIND", "FLUCTUATING_WIND", "PREVAILING_WIND"]
     }
     for(var key in option_id_labels)
     {
@@ -227,6 +232,56 @@ function add_stackparams(stack_id){
       add_option(options, key, option_label)
     }
     </script>
+
+
+
+
+
+  <script language="javascript" type="text/javascript">
+    var option_id_labels = {"output": "Output View Type"}
+    // var option_list = {  "output": ["PLAN_VIEW", "HEIGHT_SLICE", "SURFACE_TIME", "NO_PLOT"]    }
+    var option_list = {  "output": ["PLAN_VIEW", "HEIGHT_SLICE", "SURFACE_TIME"]    }
+    for(var key in option_id_labels)
+    {
+        var option_label = option_id_labels[key];
+        var options = option_list[key];
+        add_option(options, key, option_label)
+    }
+    const output_ele = document.getElementById("output").addEventListener("change", function(){
+        const output_choice = this.value;
+        console.log(output_choice)
+        if(output_choice == 1){
+            document.getElementById('x_slice').hidden = true;
+            document.getElementById('y_slice').hidden = true;
+            document.getElementById('num_contour').hidden = false;
+        } else if(output_choice == 2){ // HEIGHT_SLICE
+            document.getElementById('x_slice').hidden = false;
+            document.getElementById('y_slice').hidden = true;
+            document.getElementById('num_contour').hidden = false;            
+        } else if(output_choice == 3){ // SURFACE_TIME
+            document.getElementById('x_slice').hidden = false;
+            document.getElementById('y_slice').hidden = false;
+            document.getElementById('num_contour').hidden = true;                        
+        } 
+    });
+  </script>
+
+
+  <div id = "num_contour" language="javascript" type="text/javascript">
+    <label for = "num_contour"> Approx Number of Contours:  </label>
+    <input type = "text"  name = "num_contour" id = "num_contour" value = 10> <br>
+  </div>
+
+  <div id = "x_slice" hidden language="javascript" type="text/javascript">
+    <label for = "x_slice"> Slice id in x-driection (0-50):  </label>
+    <input type = "text"  name = "x_slice" id = "x_slice" value = 25> <br>
+  </div>
+
+
+  <div id = "y_slice" hidden language="javascript" type="text/javascript">
+    <label for = "y_slice"> Slice id in y-driection (0-50):  </label>
+    <input type = "text" name = "y_slice" id = "y_slice" value = 0> <br>
+  </div>
 
   <input type="submit" value = "Run Simulation" id = "one_map_api_key">
   <label> Support Contact: </label>

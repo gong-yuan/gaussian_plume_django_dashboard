@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import io
 import urllib, base64
 import requests
+import pandas as pd
 # rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
 #rc('font',**{'family':'serif','serif':['Palatino']})
@@ -100,7 +101,8 @@ def smooth(y, box_pts):
     y_smooth = np.convolve(y, box, mode='same')
     return y_smooth
 
-def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, rotate_counter_clock_wise = 0):
+def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, rotate_counter_clock_wise = 0):
+    print("Aerosol: ", aerosol_type)
     ##########################################################################
     ##################Location Conversion#####################################
     ##########################################################################
@@ -157,6 +159,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     dxy=100;          # resolution of the model in both x and y directions
     dz=10;
     x=np.mgrid[-2500:2500+dxy:dxy]; # solve on a 5 km domain
+    print("len(x): ", len(x))
     y=x;              # x-grid is same as y-grid
     #--------------------------------------------------------------------------
     times=np.mgrid[1:(days)*24+1:1]/24.;
@@ -236,11 +239,12 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     if humidify == DRY_AEROSOL:
        print('do not humidify');
     elif humidify == HUMIDIFY:
-       mass=np.pi/6.*rho_s[aerosol_type]*dry_size**3.;
-       moles=mass/Ms[aerosol_type];
+       aerosol_type_act = aerosol_type - 1
+       mass=np.pi/6.*rho_s[aerosol_type_act]*dry_size**3.;
+       moles=mass/Ms[aerosol_type_act];
 
-       nw=RH*nu[aerosol_type]*moles/(1.-RH);
-       mass2=nw*Mw+moles*Ms[aerosol_type];
+       nw=RH*nu[aerosol_type_act]*moles/(1.-RH);
+       mass2=nw*Mw+moles*Ms[aerosol_type_act];
        C1=C1*mass2/mass;
     else:
        sys.exit()
@@ -248,45 +252,63 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
 
 
 
-    cmap = plt.get_cmap('cubehelix_r')
+    # cmap = plt.get_cmap('cubehelix_r')
     # output the plots
+    cmap = plt.get_cmap('Blues')
+    widc = 0.8
     if output == PLAN_VIEW:
-       plt.figure()
-       # plt.ion()
+        # plt.figure();
+       concentration = np.mean(C1,axis=2)*1e6
        new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
-       # set_trace()
        x,y = calc_center(stack_xm, stack_ym)
-       # x,y = coor_convert(cen_lat, cen_lon, onemap_api_key, '4326to3414')
        new_x, new_y = new_x + x, new_y + y
-       # plt.pcolor(x,y,np.mean(C1,axis=2)*1e6, cmap=cmap)
-       # 'jet')
-       # plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
-       plt.contour(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap='hot')
+       plt.contour(new_x,new_y,concentration, levels = num_contour, cmap=cmap, linewidths = widc) #'hot')
        plt.clim((0, 1e2));
+       for i in range(len(stack_xm)):
+           plt.plot([stack_xm[i]], [stack_ym[i]], '+', label='Stack ' + (str(i + 1)))
+       plt.legend()
+
+       # plt.pcolor(x,y,np.mean(C1,axis=2)*1e6, cmap=cmap) # 'jet')
+       # plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
+       # new_x = x
+       # new_y = y
+       # plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
+
        plt.title(stability_str + '\n' + wind_dir_str);
        plt.xlabel('x (metres)');
        plt.ylabel('y (metres)');
        cb1=plt.colorbar();
        cb1.set_label('$\mu$ g m$^{-3}$');
        # from pdb import set_trace; set_trace()
-
-       # print(convert_point(1, 0, 45))
-       return process_plot(plt)
+       data = pd.DataFrame({'X': new_x.reshape(-1), 'Y': new_y.reshape(-1), 'Concentration_µg': concentration.reshape(-1)})
+       # set_trace()
+       return process_df(data), process_plot(plt)
        # plt.show()
 
     elif output == HEIGHT_SLICE:
-       plt.figure();
+       # plt.figure();
        # plt.ion()
+        concentration = np.mean(C1,axis=2)*1e6
+        new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
+        x,y = calc_center(stack_xm, stack_ym)
+        new_x, new_y = new_x + x, new_y + y
+        # plt.pcolor(new_y,z,concentration, cmap=cmap)  # 'jet')
+        plt.contour(new_y, z,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
+        for i in range(len(stack_xm)):
+            plt.plot([stack_ym[i]], [H[i]], '+', label='Stack ' + (str(i + 1)))
+        plt.legend()
+       # new_y = y
+        # plt.pcolor(new_y,z,concentration, cmap=cmap)  # 'jet')
 
-       plt.pcolor(y,z,np.mean(C1,axis=2)*1e6, cmap=cmap) # 'jet')
-       plt.clim((0,1e2));
-       plt.xlabel('y (metres)');
-       plt.ylabel('z (metres)');
-       plt.title(stability_str + '\n' + wind_dir_str);
-       cb1=plt.colorbar();
-       cb1.set_label('$\mu$ g m$^{-3}$');
-       # plt.show()
-       return process_plot(plt)
+        plt.clim((0,1e2));
+        plt.xlabel('y (metres)');
+        plt.ylabel('z (metres)');
+        plt.title(stability_str + '\n' + wind_dir_str);
+        cb1=plt.colorbar();
+        cb1.set_label('$\mu$ g m$^{-3}$');
+        # plt.show()
+        data = pd.DataFrame({'y': new_y.reshape(-1), 'Z': z.reshape(-1), 'Concentration_µg': concentration.reshape(-1)})
+        return process_df(data), process_plot(plt)
 
     elif output == SURFACE_TIME:
        f,(ax1, ax2) = plt.subplots(2, sharex=True, sharey=False)
@@ -304,8 +326,9 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        ax2.plot(times,stability);
        ax2.set_xlabel('time (days)');
        ax2.set_ylabel('Stability parameter');
+       data = pd.DataFrame({'Time': times, 'MassLoading ($\mu$ g m$^{-3}$)': 1e6*np.squeeze(C1[y_slice,x_slice,:])})
        # f.show()
-       return process_plot(plt)
+       return process_df(data), process_plot(plt)
 
     elif output == NO_PLOT:
        print('don''t plot');
@@ -314,13 +337,20 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
 
 
 ###########################################################################
-
+def process_df(data):
+    buf = io.BytesIO()
+    data.to_csv(buf, index = False)
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri =  urllib.parse.quote(string)
+    return uri
 
 def process_plot(plt):
     fig = plt.gcf()
     #convert graph into dtring buffer and then we convert 64 bit code into image
     buf = io.BytesIO()
     fig.savefig(buf,format='png', dpi = 600)
+    plt.close()
     buf.seek(0)
     string = base64.b64encode(buf.read())
     uri =  urllib.parse.quote(string)

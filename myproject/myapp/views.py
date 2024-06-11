@@ -31,8 +31,8 @@ def counter(request):
     labels = {}
     fields = {"RH": "Relative Air Humidity",
               "dry_size": "Dry Diameter (m)",
-              "x_slice": "Slice id in x-driection (1-50)",
-              "y_slice": "Slice id in y-direction (1-50)",
+              "x_slice": "Slice id in x-driection (0-50)",
+              "y_slice": "Slice id in y-direction (0-50)",
               "days": "Model Run-time in days",
               # 'onemap_api_key': "Onemap API Key",
               "stack_x0": "x-coordinate of stack 1",
@@ -74,6 +74,7 @@ def counter(request):
     used_stack_names = [x for i in range(num_stacks) for x in ["stack_x" + str(i), "stack_y" + str(i), "Q" + str(i),  "H" + str(i)]]
     vstab = int(request.GET['stability_used'])
     print("vstab: ", vstab)
+    output = int(request.GET['output'])
     option_values = {}
     # for key in sorted(fields.keys()) + sorted(option_id_labels.keys()):
     for key in fields.keys():
@@ -88,8 +89,13 @@ def counter(request):
                 set_trace()
             if curr_val % 1 == 0:
                 curr_val = int(curr_val)
+
         if key in set(stack_names).difference(used_stack_names): continue
         if (vstab == 2) and (key == 'stab1'): continue
+        if (output == 1) and (key in ['x_slice', 'y_slice']): continue
+        if (output == 2) and (key in ['y_slice']): continue
+        if (output == 3) and (key in ['num_contour']): continue
+
         context[key] = curr_val
         labels[key] = fields[key]
         if key in option_list.keys():
@@ -103,8 +109,8 @@ def counter(request):
     stab1=int(request.GET['stab1']) # context['stab1']; # set from 1-6
     stability_used=context['stability_used'];
     output=context['output'];
-    x_slice=context['x_slice'] # position (1-50) to take the slice in the x-direction
-    y_slice=context['y_slice'];  # position (1-50) to plot concentrations vs time
+    x_slice=int(request.GET['x_slice']) # context['x_slice'] # position (1-50) to take the slice in the x-direction
+    y_slice=int(request.GET['y_slice']) # context['y_slice'];  # position (1-50) to plot concentrations vs time
     wind=context['wind'];
     stacks=context['stacks'];
     stack_x=[context['stack_x' + str(x)] for x in range(stacks)];
@@ -116,8 +122,10 @@ def counter(request):
     # onemap_api_key = context['onemap_api_key']
     wind_dir = float(context['wind_dir'])
     rotation = wind_dir - 270
+    num_contour = int(request.GET['num_contour'])
 
-    uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, rotation)
+    details, uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, rotation)
     context['uri'] = uri
+    context['Details'] = details
     # return render(request,'counter.html',{'data':uri})
     return render(request, 'counter.html', {'data': context, 'label': labels, 'option_values': option_values})
