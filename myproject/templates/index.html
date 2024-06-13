@@ -40,8 +40,8 @@
 function add_stackparams(stack_id){
     var stack_id_1 = stack_id-1;
     var  fields_p2 = {};
-    fields_p2["stack_x" + stack_id_1] = "x-coordinate of stack " +  stack_id;
-    fields_p2["stack_y" + stack_id_1] = "y-coordinate of stack " +  stack_id;
+    fields_p2["stack_x" + stack_id_1] = "latitude of stack " +  stack_id;
+    fields_p2["stack_y" + stack_id_1] = "longitude of stack " +  stack_id;
     fields_p2["Q" + stack_id_1] = "Mass emitted per unit time of stack " +  stack_id;
     fields_p2["H" + stack_id_1] = "Height of stack " + stack_id + " (m)";
 
@@ -273,13 +273,13 @@ function add_stackparams(stack_id){
   </div>
 
   <div id = "x_slice" hidden language="javascript" type="text/javascript">
-    <label for = "x_slice"> Slice id in x-driection (0-50):  </label>
+    <label for = "x_slice"> Slice id in x-direction (0-50):  </label>
     <input type = "text"  name = "x_slice" id = "x_slice" value = 25> <br>
   </div>
 
 
   <div id = "y_slice" hidden language="javascript" type="text/javascript">
-    <label for = "y_slice"> Slice id in y-driection (0-50):  </label>
+    <label for = "y_slice"> Slice id in y-direction (0-50):  </label>
     <input type = "text" name = "y_slice" id = "y_slice" value = 0> <br>
   </div>
 

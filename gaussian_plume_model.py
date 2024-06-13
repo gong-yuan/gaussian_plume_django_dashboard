@@ -27,8 +27,8 @@ import requests
 import pandas as pd
 # rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
-#rc('font',**{'family':'serif','serif':['Palatino']})
-# rc('text', usetex=True)
+#rc('font',*x-coordinatey':'serif','serif':['Palatino']})
+# rc('tx-coordinateetex=True)
 
 def convert_point(x, y, deg):
     theta1 = math.radians(deg)
@@ -292,8 +292,8 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
         new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
         x,y = calc_center(stack_xm, stack_ym)
         new_x, new_y = new_x + x, new_y + y
-        # plt.pcolor(new_y,z,concentration, cmap=cmap)  # 'jet')
-        plt.contour(new_y, z,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
+        plt.pcolor(new_y,z,concentration, cmap=cmap)  # 'jet')
+        # plt.contour(new_y, z,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
         for i in range(len(stack_xm)):
             plt.plot([stack_ym[i]], [H[i]], '+', label='Stack ' + (str(i + 1)))
         plt.legend()
