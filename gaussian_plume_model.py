@@ -275,8 +275,8 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        # plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
 
        plt.title(stability_str + '\n' + wind_dir_str);
-       plt.xlabel('x (metres)');
-       plt.ylabel('y (metres)');
+       plt.xlabel('x');
+       plt.ylabel('y');
        cb1=plt.colorbar();
        cb1.set_label('$\mu$ g m$^{-3}$');
        # from pdb import set_trace; set_trace()
@@ -301,7 +301,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
         # plt.pcolor(new_y,z,concentration, cmap=cmap)  # 'jet')
 
         plt.clim((np.min(concentration), np.max(concentration)));
-        plt.xlabel('y (metres)');
+        plt.xlabel('y');
         plt.ylabel('z (metres)');
         plt.title(stability_str + '\n' + wind_dir_str);
         cb1=plt.colorbar();
