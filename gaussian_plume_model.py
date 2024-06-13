@@ -262,8 +262,8 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
        x,y = calc_center(stack_xm, stack_ym)
        new_x, new_y = new_x + x, new_y + y
-       plt.contour(new_x,new_y,concentration, levels = num_contour, cmap=cmap, linewidths = widc) #'hot')
-       plt.clim((0, 1e2));
+       plt.contour(new_x,new_y,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
+       plt.clim((np.min(concentration), np.max(concentration)));
        for i in range(len(stack_xm)):
            plt.plot([stack_xm[i]], [stack_ym[i]], '+', label='Stack ' + (str(i + 1)))
        plt.legend()
@@ -300,7 +300,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        # new_y = y
         # plt.pcolor(new_y,z,concentration, cmap=cmap)  # 'jet')
 
-        plt.clim((0,1e2));
+        plt.clim((np.min(concentration), np.max(concentration)));
         plt.xlabel('y (metres)');
         plt.ylabel('z (metres)');
         plt.title(stability_str + '\n' + wind_dir_str);
