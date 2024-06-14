@@ -107,14 +107,22 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     ##################Location Conversion#####################################
     ##########################################################################
     print("stack_x: ", stack_x, "stack_y: ", stack_y)
+    stack_x_orig, stack_y_orig = stack_x.copy(), stack_y.copy()
     onemap_api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmY2Y3MjZjMmQ1NjgzNTI1NzZlNGIwYjc3NWZmN2ZjNSIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzE4MzMwNTIzLCJleHAiOjE3MTg1ODk3MjMsIm5iZiI6MTcxODMzMDUyMywianRpIjoiUWxQakdrdjBTckJaNUVoZyIsInVzZXJfaWQiOjM3NzAsImZvcmV2ZXIiOmZhbHNlfQ.33CcDCMoDgHXGlPDE1aXdHFestlNZeI8T7PpYbX23K0'
-    stack_x, stack_y = coors_convert(stack_x, stack_y, onemap_api_key, '4326to3414')
-    print("stack_xnew: ", stack_x, "stack_ynew: ", stack_y)
-    stack_xm = stack_x.copy()
-    stack_ym = stack_y.copy()
-    cx,cy = calc_center(stack_x, stack_y)
-    stack_x, stack_y = center_coors(stack_x, stack_y, cx, cy)
-    print("stack_xnew: ", stack_x, "stack_ynew: ", stack_y)
+    stack_xm, stack_ym = coors_convert(stack_x, stack_y, onemap_api_key, '4326to3414')
+    print("converted to x, y. stack_x: ", stack_xm, "stack_y: ", stack_ym)
+    stack_x_rotate = []
+    stack_y_rotate = []
+    for i in range(len(stack_xm)):
+        x_r, y_r = convert_point(stack_xm[i], stack_ym[i], rotate_counter_clock_wise)
+        stack_x_rotate.append(x_r)
+        stack_y_rotate.append(y_r)
+    print("rotated x,y: stack_x: ", stack_x_rotate, "stack_y: ", stack_y_rotate)
+
+    cx,cy = calc_center(stack_x_rotate, stack_y_rotate)
+    stack_x, stack_y = center_coors(stack_x_rotate, stack_y_rotate, cx, cy)
+    print("centered x, y. stack_xnew: ", stack_x, "stack_ynew: ", stack_y)
+
     ##########################################################################
     ###########################################################################
 
@@ -251,7 +259,16 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
 
 
 
+    stack_x_rotate_back = []
+    stack_y_rotate_back = []
+    for i in range(len(stack_xm)):
+        x_r, y_r = convert_point(stack_x[i], stack_y[i], -rotate_counter_clock_wise)
+        stack_x_rotate_back.append(x_r)
+        stack_y_rotate_back.append(y_r)
+    print("rotated back x,y: stack_x: ", stack_x_rotate_back, "stack_y: ", stack_y_rotate_back)
 
+    x_shift = stack_xm[0] - stack_x_rotate_back[0]
+    y_shift = stack_ym[0] - stack_y_rotate_back[0]
     # cmap = plt.get_cmap('cubehelix_r')
     # output the plots
     cmap = plt.get_cmap('Blues')
@@ -259,26 +276,36 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     if output == PLAN_VIEW:
         # plt.figure();
        concentration = np.mean(C1,axis=2)*1e6
-       new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
-       stack_x_rotate = []
-       stack_y_rotate = []
-       for i in range(len(stack_xm)):
-           x_r, y_r = convert_point(stack_xm[i], stack_ym[i], rotate_counter_clock_wise)
-           stack_x_rotate.append(x_r)
-           stack_y_rotate.append(y_r)
-       x,y = calc_center(stack_x_rotate, stack_y_rotate)
-       new_x, new_y = new_x + x, new_y + y
-       plt.contour(new_x,new_y,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
-       plt.clim((np.min(concentration), np.max(concentration)));
-       for i in range(len(stack_xm)):
-           plt.plot([stack_x_rotate[i]], [stack_y_rotate[i]], '+', label='Stack ' + (str(i + 1)))
-       plt.legend()
+       # new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
+       # stack_x_rotate = []
+       # stack_y_rotate = []
+       # for i in range(len(stack_xm)):
+       #     x_r, y_r = convert_point(stack_xm[i], stack_ym[i], rotate_counter_clock_wise)
+       #     stack_x_rotate.append(x_r)
+       #     stack_y_rotate.append(y_r)
+       # x,y = calc_center(stack_x_rotate, stack_y_rotate)
+       # new_x, new_y = new_x + x, new_y + y
+       # plt.contour(new_x,new_y,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
+       # plt.clim((np.min(concentration), np.max(concentration)));
+       # for i in range(len(stack_xm)):
+       #     plt.plot([stack_x_rotate[i]], [stack_y_rotate[i]], '+', label='Stack ' + (str(i + 1)))
+       # plt.legend()
 
        # plt.pcolor(x,y,np.mean(C1,axis=2)*1e6, cmap=cmap) # 'jet')
        # plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
        # new_x = x
        # new_y = y
        # plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
+
+       # new_x = x
+       # new_y = y
+       new_x, new_y = convert_points(x, y, -rotate_counter_clock_wise)
+       new_x, new_y = new_x + x_shift, new_y + y_shift
+       plt.contour(new_x,new_y,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
+       plt.clim((np.min(concentration), np.max(concentration)));
+       for i in range(len(stack_x)):
+           plt.plot([stack_xm[i]], [stack_ym[i]], '+', label='Stack ' + (str(i + 1)))
+       plt.legend()
 
        plt.title(stability_str + '\n' + wind_dir_str);
        plt.xlabel('x');
@@ -295,9 +322,8 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        # plt.figure();
        # plt.ion()
         concentration = np.mean(C1,axis=2)*1e6
-        new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
-        x,y = calc_center(stack_xm, stack_ym)
-        new_x, new_y = new_x + x, new_y + y
+        new_x, new_y = convert_points(x, y, -rotate_counter_clock_wise)
+        new_x, new_y = new_x + x_shift, new_y + y_shift
         plt.pcolor(new_y,z,concentration, cmap=cmap)  # 'jet')
         # plt.contour(new_y, z,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
         for i in range(len(stack_xm)):

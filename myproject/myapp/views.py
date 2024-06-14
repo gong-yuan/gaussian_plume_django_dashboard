@@ -121,10 +121,11 @@ def counter(request):
     days=context['days'];          # run the model for 365 days
     # onemap_api_key = context['onemap_api_key']
     wind_dir = float(context['wind_dir'])
-    rotation = wind_dir - 270
+    # rotation = wind_dir - 270
+    rotation_for_companies = 270 - wind_dir
     num_contour = int(request.GET['num_contour'])
 
-    details, uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, rotation)
+    details, uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, rotation_for_companies)
     context['uri'] = uri
     context['Details'] = details
     # return render(request,'counter.html',{'data':uri})
