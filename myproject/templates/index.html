@@ -150,9 +150,9 @@ function add_stackparams(stack_id){
 
 
   <script language="javascript" type="text/javascript">
-    var fields_p1 = {"RH": "Relative Air Humidity", "dry_size": "Dry Diameter (m)", "days": "Model Run-time in days", "wind_dir": "Wind Direction (→: 0, ↑: 90, ↓: 270, ←: 180)"};
+    var fields_p1 = {"RH": "Relative Air Humidity", "dry_size": "Dry Diameter (m)", "days": "Model Run-time in days", "wind_dir": "Wind Direction (→: 0, ↑: 90, ↓: 270, ←: 180)", 'windspeed': "Wind Speed (m/s)"};
     var fields_p1_default = {
-        "RH": 0.90, "dry_size": 60/Math.pow(10, 9), 'days': 50, 'wind_dir': 270
+        "RH": 0.90, "dry_size": 60/Math.pow(10, 9), 'days': 50, 'wind_dir': 270, 'windspeed': 5
     }
     for(var key in fields_p1)
     {

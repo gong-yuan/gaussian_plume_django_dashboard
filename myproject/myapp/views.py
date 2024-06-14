@@ -57,7 +57,8 @@ def counter(request):
         "wind": "Wind Field",
         "wind_dir": "Wind Direction (→: 0, ↑: 90, ↓: 270, ←: 180)",
         # 'cen_lat': "Center Latitude", 'cen_lon': "Center Longitude",
-        "stacks": "Number of Stacks"
+        "stacks": "Number of Stacks",
+        "windspeed": "Wind Speed (m/s)"
     }
 
     option_list = {
@@ -124,8 +125,8 @@ def counter(request):
     # rotation = wind_dir - 270
     rotation_for_companies = 270 - wind_dir
     num_contour = int(request.GET['num_contour'])
-
-    details, uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, rotation_for_companies)
+    windspeed = int(request.GET['windspeed'])
+    details, uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, windspeed, rotation_for_companies)
     context['uri'] = uri
     context['Details'] = details
     # return render(request,'counter.html',{'data':uri})

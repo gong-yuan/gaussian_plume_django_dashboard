@@ -101,7 +101,7 @@ def smooth(y, box_pts):
     y_smooth = np.convolve(y, box, mode='same')
     return y_smooth
 
-def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, rotate_counter_clock_wise = 0):
+def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, windspeed, rotate_counter_clock_wise = 0):
     print("Aerosol: ", aerosol_type)
     ##########################################################################
     ##################Location Conversion#####################################
@@ -208,7 +208,9 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
 
 
     # Set the wind based on input flags++++++++++++++++++++++++++++++++++++++++
-    wind_speed=5.*np.ones((days*24,1)); # m/s
+    
+    wind_speed=float(windspeed)*np.ones((days*24,1)); # m/s
+    print(f"Using windspeed: {wind_speed}")
     if wind == CONSTANT_WIND:
        wind_dir=0.*np.ones((days*24,1));
        wind_dir_str='Constant wind';
