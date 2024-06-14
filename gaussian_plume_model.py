@@ -260,12 +260,18 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
         # plt.figure();
        concentration = np.mean(C1,axis=2)*1e6
        new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
-       x,y = calc_center(stack_xm, stack_ym)
+       stack_x_rotate = []
+       stack_y_rotate = []
+       for i in range(len(stack_xm)):
+           x_r, y_r = convert_point(stack_xm[i], stack_ym[i], rotate_counter_clock_wise)
+           stack_x_rotate.append(x_r)
+           stack_y_rotate.append(y_r)
+       x,y = calc_center(stack_x_rotate, stack_y_rotate)
        new_x, new_y = new_x + x, new_y + y
        plt.contour(new_x,new_y,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
        plt.clim((np.min(concentration), np.max(concentration)));
        for i in range(len(stack_xm)):
-           plt.plot([stack_xm[i]], [stack_ym[i]], '+', label='Stack ' + (str(i + 1)))
+           plt.plot([stack_x_rotate[i]], [stack_y_rotate[i]], '+', label='Stack ' + (str(i + 1)))
        plt.legend()
 
        # plt.pcolor(x,y,np.mean(C1,axis=2)*1e6, cmap=cmap) # 'jet')
