@@ -107,7 +107,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     ##################Location Conversion#####################################
     ##########################################################################
     print("stack_x: ", stack_x, "stack_y: ", stack_y)
-    onemap_api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmY2Y3MjZjMmQ1NjgzNTI1NzZlNGIwYjc3NWZmN2ZjNSIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzE4MDExNTg5LCJleHAiOjE3MTgyNzA3ODksIm5iZiI6MTcxODAxMTU4OSwianRpIjoidlhrcHhMZWxXbjBzdHBUdyIsInVzZXJfaWQiOjM3NzAsImZvcmV2ZXIiOmZhbHNlfQ.JfCAVLciOb2qqxTxVIY3ylZs9HJCBnazpQoZRwTCRaY'
+    onemap_api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmY2Y3MjZjMmQ1NjgzNTI1NzZlNGIwYjc3NWZmN2ZjNSIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzE4MzMwNTIzLCJleHAiOjE3MTg1ODk3MjMsIm5iZiI6MTcxODMzMDUyMywianRpIjoiUWxQakdrdjBTckJaNUVoZyIsInVzZXJfaWQiOjM3NzAsImZvcmV2ZXIiOmZhbHNlfQ.33CcDCMoDgHXGlPDE1aXdHFestlNZeI8T7PpYbX23K0'
     stack_x, stack_y = coors_convert(stack_x, stack_y, onemap_api_key, '4326to3414')
     print("stack_xnew: ", stack_x, "stack_ynew: ", stack_y)
     stack_xm = stack_x.copy()
