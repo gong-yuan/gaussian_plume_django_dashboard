@@ -47,9 +47,10 @@ function add_stackparams(stack_id){
 
     <!-- var stack_x_default = [0, 1000, -200]; -->
     <!-- var stack_y_default = [0, 250, -500]; -->
-    var stack_x_default = [1.2815804, 1.2799174, 1.2719954];
-    var stack_y_default = [103.7078741, 103.7089471, 103.7085381];
-    var q_default = [40, 40, 40];
+    var stack_x_default = [1.2807987, 1.2664390, 1.2669337];
+    var stack_y_default = [103.7124667, 103.6969910, 103.7120285];
+    var q_default = [40, 60, 80];
+    <!-- var q_default = [100, 100, 100]; -->
     var h_default = [50, 50, 50];
     var  fields_p2_default = {};
     fields_p2_default["stack_x" + stack_id_1] = stack_x_default[stack_id_1];
@@ -152,7 +153,7 @@ function add_stackparams(stack_id){
   <script language="javascript" type="text/javascript">
     var fields_p1 = {"RH": "Relative Air Humidity", "dry_size": "Dry Diameter (m)", "days": "Model Run-time in days", "wind_dir": "Wind Direction (→: 0, ↑: 90, ↓: 270, ←: 180)", 'windspeed': "Wind Speed (m/s)"};
     var fields_p1_default = {
-        "RH": 0.90, "dry_size": 60/Math.pow(10, 9), 'days': 50, 'wind_dir': 270, 'windspeed': 5
+        "RH": 0.90, "dry_size": 60/Math.pow(10, 9), 'days': 50, 'wind_dir': 225, 'windspeed': 5
     }
     for(var key in fields_p1)
     {
@@ -269,7 +270,7 @@ function add_stackparams(stack_id){
 
   <div id = "num_contour" language="javascript" type="text/javascript">
     <label for = "num_contour"> Approx Number of Contours:  </label>
-    <input type = "text"  name = "num_contour" id = "num_contour" value = 10> <br>
+    <input type = "text"  name = "num_contour" id = "num_contour" value = 100> <br>
   </div>
 
   <div id = "x_slice" hidden language="javascript" type="text/javascript">

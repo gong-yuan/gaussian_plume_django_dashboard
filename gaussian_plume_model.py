@@ -108,7 +108,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     ##########################################################################
     print("stack_x: ", stack_x, "stack_y: ", stack_y)
     stack_x_orig, stack_y_orig = stack_x.copy(), stack_y.copy()
-    onemap_api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmY2Y3MjZjMmQ1NjgzNTI1NzZlNGIwYjc3NWZmN2ZjNSIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzE4MzMwNTIzLCJleHAiOjE3MTg1ODk3MjMsIm5iZiI6MTcxODMzMDUyMywianRpIjoiUWxQakdrdjBTckJaNUVoZyIsInVzZXJfaWQiOjM3NzAsImZvcmV2ZXIiOmZhbHNlfQ.33CcDCMoDgHXGlPDE1aXdHFestlNZeI8T7PpYbX23K0'
+    onemap_api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmY2Y3MjZjMmQ1NjgzNTI1NzZlNGIwYjc3NWZmN2ZjNSIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzE4NjgwMTY5LCJleHAiOjE3MTg5MzkzNjksIm5iZiI6MTcxODY4MDE2OSwianRpIjoiSU1mQ2JZU3Vld09naXo2RyIsInVzZXJfaWQiOjM3NzAsImZvcmV2ZXIiOmZhbHNlfQ.dIfVZkzjqRX52tzyZW7AI6tNk0MdISObH4WGISrABMg'
     stack_xm, stack_ym = coors_convert(stack_x, stack_y, onemap_api_key, '4326to3414')
     print("converted to x, y. stack_x: ", stack_xm, "stack_y: ", stack_ym)
     stack_x_rotate = []
@@ -274,7 +274,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     # cmap = plt.get_cmap('cubehelix_r')
     # output the plots
     cmap = plt.get_cmap('Blues')
-    widc = 0.8
+    widc = 0.4
     if output == PLAN_VIEW:
         # plt.figure();
        concentration = np.mean(C1,axis=2)*1e6
