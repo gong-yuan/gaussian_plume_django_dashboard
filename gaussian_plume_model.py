@@ -25,6 +25,8 @@ import io
 import urllib, base64
 import requests
 import pandas as pd
+import requests
+
 # rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
 #rc('font',*x-coordinatey':'serif','serif':['Palatino']})
@@ -108,7 +110,12 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     ##########################################################################
     print("stack_x: ", stack_x, "stack_y: ", stack_y)
     stack_x_orig, stack_y_orig = stack_x.copy(), stack_y.copy()
-    onemap_api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmY2Y3MjZjMmQ1NjgzNTI1NzZlNGIwYjc3NWZmN2ZjNSIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzIxODk1MDE0LCJleHAiOjE3MjIxNTQyMTQsIm5iZiI6MTcyMTg5NTAxNCwianRpIjoiMnNhNzE4TjBka056akVmWCIsInVzZXJfaWQiOjM3NzAsImZvcmV2ZXIiOmZhbHNlfQ.bDZ8k3lacewLCIjVB01aOUha2WSUqqag394mv6cn0xc'
+    url = "https://www.onemap.gov.sg/api/auth/post/getToken"
+    payload = {"email": "gygongyuan@gmail.com", "password": "GYOnemapmap@1"}
+    response = requests.request("POST", url, json=payload)
+    auth = response.json()
+    onemap_api_key = auth['access_token']
+    # onemap_api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmY2Y3MjZjMmQ1NjgzNTI1NzZlNGIwYjc3NWZmN2ZjNSIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzIxODk1MDE0LCJleHAiOjE3MjIxNTQyMTQsIm5iZiI6MTcyMTg5NTAxNCwianRpIjoiMnNhNzE4TjBka056akVmWCIsInVzZXJfaWQiOjM3NzAsImZvcmV2ZXIiOmZhbHNlfQ.bDZ8k3lacewLCIjVB01aOUha2WSUqqag394mv6cn0xc'
     stack_xm, stack_ym = coors_convert(stack_x, stack_y, onemap_api_key, '4326to3414')
     print("converted to x, y. stack_x: ", stack_xm, "stack_y: ", stack_ym)
     stack_x_rotate = []
