@@ -26,6 +26,7 @@ import urllib, base64
 import requests
 import pandas as pd
 import requests
+from pdb import set_trace
 
 # rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
@@ -103,7 +104,7 @@ def smooth(y, box_pts):
     y_smooth = np.convolve(y, box, mode='same')
     return y_smooth
 
-def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, windspeed, rotate_counter_clock_wise = 0):
+def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, windspeed, wind_dir_deg):
     print("Aerosol: ", aerosol_type)
     ##########################################################################
     ##################Location Conversion#####################################
@@ -115,20 +116,11 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     response = requests.request("POST", url, json=payload)
     auth = response.json()
     onemap_api_key = auth['access_token']
-    # onemap_api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmY2Y3MjZjMmQ1NjgzNTI1NzZlNGIwYjc3NWZmN2ZjNSIsImlzcyI6Imh0dHA6Ly9pbnRlcm5hbC1hbGItb20tcHJkZXppdC1pdC0xMjIzNjk4OTkyLmFwLXNvdXRoZWFzdC0xLmVsYi5hbWF6b25hd3MuY29tL2FwaS92Mi91c2VyL3Bhc3N3b3JkIiwiaWF0IjoxNzIxODk1MDE0LCJleHAiOjE3MjIxNTQyMTQsIm5iZiI6MTcyMTg5NTAxNCwianRpIjoiMnNhNzE4TjBka056akVmWCIsInVzZXJfaWQiOjM3NzAsImZvcmV2ZXIiOmZhbHNlfQ.bDZ8k3lacewLCIjVB01aOUha2WSUqqag394mv6cn0xc'
     stack_xm, stack_ym = coors_convert(stack_x, stack_y, onemap_api_key, '4326to3414')
     print("converted to x, y. stack_x: ", stack_xm, "stack_y: ", stack_ym)
-    stack_x_rotate = []
-    stack_y_rotate = []
-    for i in range(len(stack_xm)):
-        x_r, y_r = convert_point(stack_xm[i], stack_ym[i], rotate_counter_clock_wise)
-        stack_x_rotate.append(x_r)
-        stack_y_rotate.append(y_r)
-    print("rotated x,y: stack_x: ", stack_x_rotate, "stack_y: ", stack_y_rotate)
-
-    cx,cy = calc_center(stack_x_rotate, stack_y_rotate)
-    stack_x, stack_y = center_coors(stack_x_rotate, stack_y_rotate, cx, cy)
-    print("centered x, y. stack_xnew: ", stack_x, "stack_ynew: ", stack_y)
+    cx,cy = calc_center(stack_xm, stack_ym)
+    stack_x, stack_y = center_coors(stack_xm, stack_ym, cx, cy)
+    print("centered x, y. in meters stack_xnew: ", stack_x, "stack_ynew: ", stack_y)
 
     ##########################################################################
     ###########################################################################
@@ -227,12 +219,11 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     elif wind == PREVAILING_WIND:
        wind_dir=-np.sqrt(2.)*erfcinv(2.*np.random.rand(24*days,1))*40.; #norminv(rand(days.*24,1),0,40);
        # note at this point you can add on the prevailing wind direction, i.e.
-       # wind_dir=wind_dir+200;
-       wind_dir[np.where(wind_dir>=360.)]= \
-            np.mod(wind_dir[np.where(wind_dir>=360)],360);
        wind_dir_str='Prevailing wind';
-    else:
-       sys.exit()
+    wind_dir=wind_dir + 270 - wind_dir_deg;
+    wind_dir[np.where(wind_dir>=360.)]= np.mod(wind_dir[np.where(wind_dir>=360)],360);
+    # else:// there is no such option
+    #    sys.exit()
     #--------------------------------------------------------------------------
 
 
@@ -246,8 +237,6 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
             C=gauss_func(Q[j],wind_speed[i],wind_dir[i],x,y,z,
                 stack_x[j],stack_y[j],H[j],Dy,Dz,stability[i]);
             C1[:,:,i]=C1[:,:,i]+C;
-
-
 
 
     # SECTION 4: Post process / output
@@ -267,52 +256,16 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        sys.exit()
 
 
-
-    stack_x_rotate_back = []
-    stack_y_rotate_back = []
-    for i in range(len(stack_xm)):
-        x_r, y_r = convert_point(stack_x[i], stack_y[i], -rotate_counter_clock_wise)
-        stack_x_rotate_back.append(x_r)
-        stack_y_rotate_back.append(y_r)
-    print("rotated back x,y: stack_x: ", stack_x_rotate_back, "stack_y: ", stack_y_rotate_back)
-
-    x_shift = stack_xm[0] - stack_x_rotate_back[0]
-    y_shift = stack_ym[0] - stack_y_rotate_back[0]
-    # cmap = plt.get_cmap('cubehelix_r')
     # output the plots
     cmap = plt.get_cmap('Blues')
     widc = 0.4
     if output == PLAN_VIEW:
         # plt.figure();
-       concentration = np.mean(C1,axis=2)*1e6
-       # new_x, new_y = convert_points(x, y, rotate_counter_clock_wise)
-       # stack_x_rotate = []
-       # stack_y_rotate = []
-       # for i in range(len(stack_xm)):
-       #     x_r, y_r = convert_point(stack_xm[i], stack_ym[i], rotate_counter_clock_wise)
-       #     stack_x_rotate.append(x_r)
-       #     stack_y_rotate.append(y_r)
-       # x,y = calc_center(stack_x_rotate, stack_y_rotate)
-       # new_x, new_y = new_x + x, new_y + y
-       # plt.contour(new_x,new_y,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
-       # plt.clim((np.min(concentration), np.max(concentration)));
-       # for i in range(len(stack_xm)):
-       #     plt.plot([stack_x_rotate[i]], [stack_y_rotate[i]], '+', label='Stack ' + (str(i + 1)))
-       # plt.legend()
-
-       # plt.pcolor(x,y,np.mean(C1,axis=2)*1e6, cmap=cmap) # 'jet')
-       # plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
-       # new_x = x
-       # new_y = y
-       # plt.pcolor(new_x,new_y,np.mean(C1,axis=2)*1e6, cmap=cmap)
-
-       # new_x = x
-       # new_y = y
-       new_x, new_y = convert_points(x, y, -rotate_counter_clock_wise)
-       new_x, new_y = new_x + x_shift, new_y + y_shift
-       plt.contour(new_x,new_y,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
+       concentration = np.nanmean(C1,axis=2)*1e6
+       plt.contour(x + cx, y + cy,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
+       # plt.pcolor(x + cx, y + cy, concentration, cmap=cmap)  # 'jet')
        plt.clim((np.min(concentration), np.max(concentration)));
-       for i in range(len(stack_x)):
+       for i in range(len(stack_xm)):
            plt.plot([stack_xm[i]], [stack_ym[i]], '+', label='Stack ' + (str(i + 1)))
        plt.legend()
 
@@ -321,25 +274,17 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
        plt.ylabel('y');
        cb1=plt.colorbar();
        cb1.set_label('$\mu$ g m$^{-3}$');
-       # from pdb import set_trace; set_trace()
-       data = pd.DataFrame({'X': new_x.reshape(-1), 'Y': new_y.reshape(-1), 'Concentration_µg': concentration.reshape(-1)})
-       # set_trace()
+       data = pd.DataFrame({'X': (x+cx).reshape(-1), 'Y': (y+cy).reshape(-1), 'Concentration_µg': concentration.reshape(-1)})
        return process_df(data), process_plot(plt)
        # plt.show()
 
     elif output == HEIGHT_SLICE:
-       # plt.figure();
-       # plt.ion()
-        concentration = np.mean(C1,axis=2)*1e6
-        new_x, new_y = convert_points(x, y, -rotate_counter_clock_wise)
-        new_x, new_y = new_x + x_shift, new_y + y_shift
-        plt.pcolor(new_y,z,concentration, cmap=cmap)  # 'jet')
-        # plt.contour(new_y, z,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
+        concentration = np.nanmean(C1,axis=2)*1e6
+        plt.pcolor(y + cy,z,concentration, cmap=cmap)
+        # plt.contour(y+cy, z,concentration, levels = num_contour, cmap=cmap, linewidths = widc)
         for i in range(len(stack_xm)):
             plt.plot([stack_ym[i]], [H[i]], '+', label='Stack ' + (str(i + 1)))
         plt.legend()
-       # new_y = y
-        # plt.pcolor(new_y,z,concentration, cmap=cmap)  # 'jet')
 
         plt.clim((np.min(concentration), np.max(concentration)));
         plt.xlabel('y');
@@ -348,7 +293,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
         cb1=plt.colorbar();
         cb1.set_label('$\mu$ g m$^{-3}$');
         # plt.show()
-        data = pd.DataFrame({'y': new_y.reshape(-1), 'Z': z.reshape(-1), 'Concentration_µg': concentration.reshape(-1)})
+        data = pd.DataFrame({'y': (y + cy).reshape(-1), 'Z': z.reshape(-1), 'Concentration_µg': concentration.reshape(-1)})
         return process_df(data), process_plot(plt)
 
     elif output == SURFACE_TIME:

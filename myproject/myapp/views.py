@@ -120,13 +120,10 @@ def counter(request):
     Q=[context['Q' + str(x)] for x in range(stacks)]; # mass emitted per unit time
     H=[context['H' + str(x)] for x in range(stacks)]; # stack height, m
     days=context['days'];          # run the model for 365 days
-    # onemap_api_key = context['onemap_api_key']
-    wind_dir = float(context['wind_dir'])
-    # rotation = wind_dir - 270
-    rotation_for_companies = 270 - wind_dir
+    wind_dir_deg = float(context['wind_dir'])
     num_contour = int(request.GET['num_contour'])
     windspeed = int(request.GET['windspeed'])
-    details, uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, windspeed, rotation_for_companies)
+    details, uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, windspeed, wind_dir_deg)
     context['uri'] = uri
     context['Details'] = details
     # return render(request,'counter.html',{'data':uri})
