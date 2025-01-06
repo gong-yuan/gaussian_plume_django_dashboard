@@ -27,7 +27,7 @@ import requests
 import pandas as pd
 import requests
 from pdb import set_trace
-
+np.random.seed(1234)
 # rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
 #rc('font',*x-coordinatey':'serif','serif':['Palatino']})
@@ -67,7 +67,6 @@ def coor_convert(val1, val2, api_key, option):
     print(rurl)
     headers = {"Authorization": api_key}
     response = requests.request("GET", rurl, headers=headers)
-
     assert response.status_code == 200
     result = response.json()
     return result[outputnames[0]], result[outputnames[1]]
@@ -78,7 +77,7 @@ def coors_convert(stack_x, stack_y, api_key, option):
     stack_ynew = []
     for i in range(len(stack_x)):
         x,y = coor_convert(stack_x[i], stack_y[i], api_key, option)
-        print("Convered: ", x,y)
+        print("Converted: ", x,y)
         stack_xnew.append(x)
         stack_ynew.append(y)
     return stack_xnew, stack_ynew
@@ -104,6 +103,14 @@ def smooth(y, box_pts):
     y_smooth = np.convolve(y, box, mode='same')
     return y_smooth
 
+def get_onemap_token(email = "gygongyuan@gmail.com", password = "Ex9fNTX2%vbd") -> str:
+    url = "https://www.onemap.gov.sg/api/auth/post/getToken"
+    payload = {"email": email, "password": password}
+    response = requests.post(url, json=payload)
+    response.raise_for_status()
+    return response.json().get('access_token')
+
+
 def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, windspeed, wind_dir_deg):
     print("Aerosol: ", aerosol_type)
     ##########################################################################
@@ -111,11 +118,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     ##########################################################################
     print("stack_x: ", stack_x, "stack_y: ", stack_y)
     stack_x_orig, stack_y_orig = stack_x.copy(), stack_y.copy()
-    url = "https://www.onemap.gov.sg/api/auth/post/getToken"
-    payload = {"email": "gygongyuan@gmail.com", "password": "GYOnemapmap@1"}
-    response = requests.request("POST", url, json=payload)
-    auth = response.json()
-    onemap_api_key = auth['access_token']
+    onemap_api_key = get_onemap_token()
     stack_xm, stack_ym = coors_convert(stack_x, stack_y, onemap_api_key, '4326to3414')
     print("converted to x, y. stack_x: ", stack_xm, "stack_y: ", stack_ym)
     cx,cy = calc_center(stack_xm, stack_ym)
@@ -147,7 +150,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     # stability of the atmosphere
     CONSTANT_STABILITY=1;
     ANNUAL_CYCLE=2;
-    stability_str=['Very unstable','Moderately unstable','Slightly unstable', \
+    stability_str=['Very unstable', 'Moderately unstable','Slightly unstable', \
         'Neutral','Moderately stable','Very stable'];
     # Aerosol properties
     HUMIDIFY=2;
@@ -177,11 +180,9 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     # SECTION 2: Act on the configuration information
     # Decide which stability profile to use
     if stability_used == CONSTANT_STABILITY:
-
        stability=stab1*np.ones((days*24,1));
        stability_str=stability_str[stab1-1];
     elif stability_used == ANNUAL_CYCLE:
-
        stability=np.round(2.5*np.cos(times*2.*np.pi/(365.))+3.5);
        stability_str='Annual cycle';
     else:
@@ -231,7 +232,7 @@ def run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, 
     # SECTION 3: Main loop
     # For all times...
     C1=np.zeros((len(x),len(y),len(wind_dir)))
-    for i in tqdm.tqdm(range(0,len(wind_dir))):
+    for i in range(0,len(wind_dir)):
        for j in range(0,stacks):
             C=np.ones((len(x),len(y)))
             C=gauss_func(Q[j],wind_speed[i],wind_dir[i],x,y,z,

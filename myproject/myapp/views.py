@@ -8,7 +8,7 @@ sys.path.append(str(BASE_DIR))
 import gaussian_plume_model
 import requests
 from pdb import set_trace
-
+template_dir = '/home/yuan/gaussian_plume/myproject/templates/'
 # from json import dumps
 # Create your views here.
 def index(request):
@@ -22,7 +22,7 @@ def index(request):
     # }
     # return render(request, 'index.html', context)
     # my_name = request.GET['my_name']
-    return render(request, 'index.html')
+    return render(request, template_dir + 'index.html')
 
 # def get_input(request):
 def counter(request):
@@ -122,9 +122,9 @@ def counter(request):
     days=context['days'];          # run the model for 365 days
     wind_dir_deg = float(context['wind_dir'])
     num_contour = int(request.GET['num_contour'])
-    windspeed = int(request.GET['windspeed'])
+    windspeed = float(request.GET['windspeed'])
     details, uri = gaussian_plume_model.run_simulation(RH, aerosol_type, dry_size, humidify, stab1, stability_used, output, x_slice, y_slice, wind, stacks, stack_x, stack_y, Q, H, days, num_contour, windspeed, wind_dir_deg)
     context['uri'] = uri
     context['Details'] = details
     # return render(request,'counter.html',{'data':uri})
-    return render(request, 'counter.html', {'data': context, 'label': labels, 'option_values': option_values})
+    return render(request, template_dir + 'counter.html', {'data': context, 'label': labels, 'option_values': option_values})
