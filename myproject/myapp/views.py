@@ -8,7 +8,7 @@ sys.path.append(str(BASE_DIR))
 import gaussian_plume_model
 import requests
 from pdb import set_trace
-template_dir = '/home/yuan/gaussian_plume/myproject/templates/'
+template_dir = './templates/'
 # from json import dumps
 # Create your views here.
 def index(request):
